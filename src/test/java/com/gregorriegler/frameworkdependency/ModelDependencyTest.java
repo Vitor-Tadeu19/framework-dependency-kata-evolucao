@@ -1,7 +1,7 @@
 package com.gregorriegler.frameworkdependency;
 
-import com.gregorriegler.frameworkdependency.model.LibraryService;
-import com.gregorriegler.frameworkdependency.model.SecurityService;
+import com.gregorriegler.frameworkdependency.security.SecurityService;
+import com.gregorriegler.frameworkdependency.services.LibraryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.stereotype.Service;
 

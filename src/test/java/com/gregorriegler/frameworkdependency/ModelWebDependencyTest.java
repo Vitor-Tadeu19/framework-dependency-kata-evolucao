@@ -1,6 +1,6 @@
 package com.gregorriegler.frameworkdependency;
 
-import com.gregorriegler.frameworkdependency.model.LibraryService;
+import com.gregorriegler.frameworkdependency.services.LibraryService;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Method;

@@ -1,8 +1,8 @@
 package com.gregorriegler.frameworkdependency;
 
-import com.gregorriegler.frameworkdependency.model.LibraryService;
-import com.gregorriegler.frameworkdependency.model.SecurityService;
 import com.gregorriegler.frameworkdependency.repository.BookRepository;
+import com.gregorriegler.frameworkdependency.security.SecurityService;
+import com.gregorriegler.frameworkdependency.services.LibraryService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
