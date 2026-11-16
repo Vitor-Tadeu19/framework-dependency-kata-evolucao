@@ -26,7 +26,7 @@ public class LibraryController {
 
     @GetMapping("/books")
     public ResponseEntity<Collection<Book>> get() {
-        return libraryService.getAllBooks();
+        return ResponseEntity.ok(libraryService.getAllBooks());
     }
 
     @PutMapping("/books/{isbn}")
@@ -34,6 +34,6 @@ public class LibraryController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void save(@PathVariable String isbn, @RequestBody CreateBookRequest request) {
         request.isbn = isbn;
-        libraryService.createBook(request);
+        libraryService.createBook(new Book(isbn, request.title, request.author));
     }
 }

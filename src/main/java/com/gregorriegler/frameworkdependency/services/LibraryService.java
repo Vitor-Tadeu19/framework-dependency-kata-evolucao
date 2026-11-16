@@ -3,10 +3,8 @@ package com.gregorriegler.frameworkdependency.services;
 import com.gregorriegler.frameworkdependency.model.Book;
 import com.gregorriegler.frameworkdependency.repository.BookRepository;
 import com.gregorriegler.frameworkdependency.security.SecurityService;
-import com.gregorriegler.frameworkdependency.dtos.request.CreateBookRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 
 import java.io.File;
@@ -29,20 +27,20 @@ public class LibraryService {
         this.repository = repository;
     }
 
-    public ResponseEntity<Collection<Book>> getAllBooks() {
+    public Collection<Book> getAllBooks() {
         if (securityService.isAuthenticated() && (securityService.isAdmin() || securityService.isUser())) {
-            return ResponseEntity.ok(repository.findAll());
+            return repository.findAll();
         } else {
             throw new AccessDeniedException("access denied!");
         }
     }
 
-    public void createBook(CreateBookRequest request) {
-        Book book = repository.findById(request.isbn).orElseGet(Book::new);
-        book.isbn = request.isbn;
-        book.title = request.title;
-        book.author = request.author;
-        repository.save(book);
+    public void createBook(Book book) {
+        Book persistedBook = repository.findById(book.isbn).orElseGet(Book::new);
+        persistedBook.isbn = book.isbn;
+        persistedBook.title = book.title;
+        persistedBook.author = book.author;
+        repository.save(persistedBook);
     }
 
     public void createBookReport() throws IOException {
