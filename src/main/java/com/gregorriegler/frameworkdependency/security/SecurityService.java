@@ -2,9 +2,9 @@ package com.gregorriegler.frameworkdependency.security;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
-@Service
+// MELHORIA 1: a classe de dominio nao tem mais @Service.
+// A configuracao do Spring ficara em outra camada, fora do modelo.
 public class SecurityService {
 
     public boolean isAuthenticated() {
