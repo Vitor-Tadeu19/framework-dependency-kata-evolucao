@@ -1,13 +1,15 @@
 package com.gregorriegler.frameworkdependency.model;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import com.gregorriegler.frameworkdependency.dtos.request.RatingRequest;
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 @Access(AccessType.FIELD)
@@ -16,6 +18,7 @@ public class Rating {
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer id;
 
+    @Column(name = "user_name")
     public String user;
 
     @Enumerated(EnumType.STRING)
