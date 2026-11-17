@@ -1,6 +1,5 @@
 package com.gregorriegler.frameworkdependency.model;
 
-import com.gregorriegler.frameworkdependency.dtos.request.RatingRequest;
 import jakarta.persistence.Access;
 import jakarta.persistence.AccessType;
 import jakarta.persistence.Column;
@@ -22,7 +21,7 @@ public class Rating {
     public String user;
 
     @Enumerated(EnumType.STRING)
-    public RatingRequest.Stars stars;
+    public RatingStars stars;
 
     public String comment;
 }

@@ -1,10 +1,8 @@
 package com.gregorriegler.frameworkdependency.dtos.request;
 
-public class RatingRequest {
-    public Stars stars;
-    public String comment;
+import com.gregorriegler.frameworkdependency.model.RatingStars;
 
-    public enum Stars {
-        ONE, TWO, THREE, FOUR, FIVE
-    }
+public class RatingRequest {
+    public RatingStars stars;
+    public String comment;
 }
