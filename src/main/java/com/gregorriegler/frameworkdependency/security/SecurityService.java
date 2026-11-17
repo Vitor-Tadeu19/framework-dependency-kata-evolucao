@@ -1,24 +1,18 @@
 package com.gregorriegler.frameworkdependency.security;
 
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
+import com.gregorriegler.frameworkdependency.model.User;
 
-// MELHORIA 1: a classe de dominio nao tem mais @Service.
-// A configuracao do Spring ficara em outra camada, fora do modelo.
 public class SecurityService {
 
-    public boolean isAuthenticated() {
-        return SecurityContextHolder.getContext().getAuthentication() != null &&
-            SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
+    public boolean canViewLibrary(User user) {
+        return user != null && (user.hasRole("ROLE_USER") || user.hasRole("ROLE_ADMIN"));
     }
 
-    public boolean isAdmin() {
-        return SecurityContextHolder.getContext().getAuthentication() != null &&
-            SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+    public boolean canCreateBook(User user) {
+        return user != null && user.hasRole("ROLE_ADMIN");
     }
 
-    public boolean isUser() {
-        return SecurityContextHolder.getContext().getAuthentication() != null &&
-            SecurityContextHolder.getContext().getAuthentication().getAuthorities().contains(new SimpleGrantedAuthority("ROLE_USER"));
+    public boolean canRateBook(User user) {
+        return user != null && user.hasRole("ROLE_USER");
     }
 }

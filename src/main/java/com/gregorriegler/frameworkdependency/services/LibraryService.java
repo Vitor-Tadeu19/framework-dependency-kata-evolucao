@@ -1,11 +1,14 @@
 package com.gregorriegler.frameworkdependency.services;
 
+import com.gregorriegler.frameworkdependency.model.AuthorizationException;
 import com.gregorriegler.frameworkdependency.model.Book;
+import com.gregorriegler.frameworkdependency.model.Rating;
+import com.gregorriegler.frameworkdependency.model.RatingStars;
+import com.gregorriegler.frameworkdependency.model.User;
 import com.gregorriegler.frameworkdependency.repository.BookRepository;
 import com.gregorriegler.frameworkdependency.security.SecurityService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.access.AccessDeniedException;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -13,8 +16,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
-// MELHORIA 1: classe de dominio sem anotacao do Spring.
-// Agora a dependencia de infraestrutura eh injetada via construtor.
 public class LibraryService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LibraryService.class);
@@ -28,19 +29,38 @@ public class LibraryService {
     }
 
     public Collection<Book> getAllBooks() {
-        if (securityService.isAuthenticated() && (securityService.isAdmin() || securityService.isUser())) {
-            return repository.findAll();
-        } else {
-            throw new AccessDeniedException("access denied!");
-        }
+        throw new AuthorizationException("access denied!");
     }
 
-    public void createBook(Book book) {
+    public Collection<Book> getAllBooks(User user) {
+        if (!securityService.canViewLibrary(user)) {
+            throw new AuthorizationException("access denied!");
+        }
+        return repository.findAll();
+    }
+
+    public void createBook(User user, Book book) {
+        if (!securityService.canCreateBook(user)) {
+            throw new AuthorizationException("access denied!");
+        }
         Book persistedBook = repository.findById(book.isbn).orElseGet(Book::new);
         persistedBook.isbn = book.isbn;
         persistedBook.title = book.title;
         persistedBook.author = book.author;
         repository.save(persistedBook);
+    }
+
+    public void rateBook(User user, String isbn, RatingStars stars, String comment) {
+        if (!securityService.canRateBook(user)) {
+            throw new AuthorizationException("access denied!");
+        }
+        repository.findById(isbn).ifPresent(book -> {
+            Rating rating = new Rating();
+            rating.user = user.name();
+            rating.stars = stars;
+            rating.comment = comment;
+            book.ratings.add(rating);
+        });
     }
 
     public void createBookReport() throws IOException {
