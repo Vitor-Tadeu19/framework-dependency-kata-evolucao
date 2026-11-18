@@ -2,26 +2,32 @@ package com.gregorriegler.frameworkdependency;
 
 import com.gregorriegler.frameworkdependency.services.LibraryService;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.scheduling.annotation.Scheduled;
 
-import java.time.Duration;
+import java.lang.reflect.Method;
 
-import static java.time.temporal.ChronoUnit.SECONDS;
-import static org.awaitility.Awaitility.await;
-import static org.mockito.Mockito.atLeast;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@SpringBootTest
 public class SchedulesTheReportTest {
- 
-    @SpyBean
-    private LibraryService libraryService;
 
     @Test
-    public void starts_report() {
-        await()
-          .atMost(Duration.of(1, SECONDS))
-          .untilAsserted(() -> verify(libraryService, atLeast(1)).createBookReport());
+    public void scheduler_runs_report_generation() throws Exception {
+        LibraryService libraryService = mock(LibraryService.class);
+        when(libraryService.generateBookReport()).thenReturn("123,title");
+        LibraryReportScheduler scheduler = new LibraryReportScheduler(libraryService);
+
+        scheduler.runReport();
+
+        verify(libraryService).generateBookReport();
+    }
+
+    @Test
+    public void report_is_triggered_by_scheduling_infrastructure() throws NoSuchMethodException {
+        Method method = LibraryReportScheduler.class.getDeclaredMethod("runReport");
+
+        assertThat(method.getAnnotation(Scheduled.class)).isNotNull();
     }
 }
