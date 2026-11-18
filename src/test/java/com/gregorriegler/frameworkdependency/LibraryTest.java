@@ -1,7 +1,7 @@
 package com.gregorriegler.frameworkdependency;
 
-import com.gregorriegler.frameworkdependency.model.Book;
-import com.gregorriegler.frameworkdependency.repository.BookRepository;
+import com.gregorriegler.frameworkdependency.infrastructure.persistence.BookEntity;
+import com.gregorriegler.frameworkdependency.infrastructure.persistence.SpringDataBookRepository;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,10 +27,7 @@ public class LibraryTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private BookRepository bookRepository;
-
-    @Autowired
-    private com.gregorriegler.frameworkdependency.repository.BookRepository springDataBookRepository;
+    private SpringDataBookRepository springDataBookRepository;
 
     @BeforeEach
     public void clearRepository() {
@@ -90,7 +87,7 @@ public class LibraryTest {
     @Test
     @WithMockUser(username = "max", roles = "USER")
     void user_can_rate_a_book() throws Exception {
-        bookRepository.save(new Book("123", "irrelevant", "irrelevant"));
+        springDataBookRepository.save(new BookEntity("123", "irrelevant", "irrelevant"));
 
         mockMvc.perform(post("/books/123/ratings")
             .contentType(MediaType.APPLICATION_JSON)
@@ -120,7 +117,7 @@ public class LibraryTest {
     @Test
     @WithMockUser(roles = "NON_USER")
     void non_user_cant_rate_a_book() throws Exception {
-        bookRepository.save(new Book("123", "irrelevant", "irrelevant"));
+        springDataBookRepository.save(new BookEntity("123", "irrelevant", "irrelevant"));
 
         mockMvc.perform(post("/books/123/ratings")
             .contentType(MediaType.APPLICATION_JSON)

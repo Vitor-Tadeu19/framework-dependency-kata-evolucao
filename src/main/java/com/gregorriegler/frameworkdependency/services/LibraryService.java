@@ -7,18 +7,11 @@ import com.gregorriegler.frameworkdependency.model.RatingStars;
 import com.gregorriegler.frameworkdependency.model.User;
 import com.gregorriegler.frameworkdependency.repository.BookRepository;
 import com.gregorriegler.frameworkdependency.security.SecurityService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class LibraryService {
-
-    private static final Logger LOG = LoggerFactory.getLogger(LibraryService.class);
 
     private final SecurityService securityService;
     private final BookRepository repository;
@@ -60,17 +53,13 @@ public class LibraryService {
             rating.stars = stars;
             rating.comment = comment;
             book.ratings.add(rating);
+            repository.save(book);
         });
     }
 
-    public void createBookReport() throws IOException {
-        String report = repository.findAll().stream()
+    public String generateBookReport() {
+        return repository.findAll().stream()
             .map(book -> book.isbn + "," + book.title)
             .collect(Collectors.joining("\n"));
-        File tmpFile = File.createTempFile("book_report", ".csv");
-        FileWriter writer = new FileWriter(tmpFile);
-        writer.write(report);
-        writer.close();
-        LOG.info("wrote book report to {}", tmpFile.toString());
     }
 }
