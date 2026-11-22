@@ -115,6 +115,22 @@ public class LibraryTest {
     }
 
     @Test
+    @WithMockUser(username = "max", roles = "USER")
+    void rating_a_missing_book_returns_created_without_creating_a_book() throws Exception {
+        mockMvc.perform(post("/books/missing/ratings")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(new JSONObject()
+                .put("stars", "FIVE")
+                .put("comment", "Rating")
+                .toString()))
+            .andExpect(status().isCreated());
+
+        mockMvc.perform(get("/books"))
+            .andExpect(status().isOk())
+            .andExpect(content().json("[]"));
+    }
+
+    @Test
     @WithMockUser(roles = "NON_USER")
     void non_user_cant_rate_a_book() throws Exception {
         springDataBookRepository.save(new BookEntity("123", "irrelevant", "irrelevant"));
