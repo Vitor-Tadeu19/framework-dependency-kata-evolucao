@@ -29,6 +29,7 @@ public class RatingService {
             rating.stars = stars;
             rating.comment = comment;
             book.ratings.add(rating);
+            repository.save(book);
         });
     }
 }
