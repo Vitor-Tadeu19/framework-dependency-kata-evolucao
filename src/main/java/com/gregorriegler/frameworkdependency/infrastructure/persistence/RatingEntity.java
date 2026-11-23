@@ -1,6 +1,6 @@
 package com.gregorriegler.frameworkdependency.infrastructure.persistence;
 
-import com.gregorriegler.frameworkdependency.model.RatingStars;
+import com.gregorriegler.frameworkdependency.model.enums.RatingStars;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;

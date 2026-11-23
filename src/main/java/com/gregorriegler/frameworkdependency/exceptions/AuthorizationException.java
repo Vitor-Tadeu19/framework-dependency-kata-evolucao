@@ -1,4 +1,4 @@
-package com.gregorriegler.frameworkdependency.model;
+package com.gregorriegler.frameworkdependency.exceptions;
 
 public class AuthorizationException extends RuntimeException {
     public AuthorizationException(String message) {

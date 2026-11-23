@@ -1,6 +1,6 @@
 package com.gregorriegler.frameworkdependency.services;
 
-import com.gregorriegler.frameworkdependency.model.AuthorizationException;
+import com.gregorriegler.frameworkdependency.exceptions.AuthorizationException;
 import com.gregorriegler.frameworkdependency.model.Book;
 import com.gregorriegler.frameworkdependency.model.User;
 import com.gregorriegler.frameworkdependency.repository.BookRepository;

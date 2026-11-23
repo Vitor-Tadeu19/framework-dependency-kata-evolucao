@@ -1,8 +1,8 @@
 package com.gregorriegler.frameworkdependency.services;
 
-import com.gregorriegler.frameworkdependency.model.AuthorizationException;
+import com.gregorriegler.frameworkdependency.exceptions.AuthorizationException;
 import com.gregorriegler.frameworkdependency.model.Rating;
-import com.gregorriegler.frameworkdependency.model.RatingStars;
+import com.gregorriegler.frameworkdependency.model.enums.RatingStars;
 import com.gregorriegler.frameworkdependency.model.User;
 import com.gregorriegler.frameworkdependency.repository.BookRepository;
 import com.gregorriegler.frameworkdependency.security.SecurityService;

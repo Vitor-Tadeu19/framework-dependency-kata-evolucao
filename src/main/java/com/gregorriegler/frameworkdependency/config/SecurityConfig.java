@@ -1,4 +1,4 @@
-package com.gregorriegler.frameworkdependency.security;
+package com.gregorriegler.frameworkdependency.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

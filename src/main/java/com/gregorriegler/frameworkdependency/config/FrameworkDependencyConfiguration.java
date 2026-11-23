@@ -1,4 +1,4 @@
-package com.gregorriegler.frameworkdependency;
+package com.gregorriegler.frameworkdependency.config;
 
 import com.gregorriegler.frameworkdependency.repository.BookRepository;
 import com.gregorriegler.frameworkdependency.security.SecurityService;
