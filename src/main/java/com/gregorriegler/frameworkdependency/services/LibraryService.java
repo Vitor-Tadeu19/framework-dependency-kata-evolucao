@@ -39,8 +39,4 @@ public class LibraryService {
         persistedBook.author = book.author;
         repository.save(persistedBook);
     }
-
-    public String generateBookReport() {
-        return new BookReportFormatter().format(repository.findAll());
-    }
 }
