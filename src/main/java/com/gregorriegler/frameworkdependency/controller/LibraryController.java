@@ -1,6 +1,8 @@
 package com.gregorriegler.frameworkdependency.controller;
 
 import com.gregorriegler.frameworkdependency.dtos.request.CreateBookRequest;
+import com.gregorriegler.frameworkdependency.dtos.response.BookResponse;
+import com.gregorriegler.frameworkdependency.dtos.response.RatingResponse;
 import com.gregorriegler.frameworkdependency.model.Book;
 import com.gregorriegler.frameworkdependency.model.User;
 import com.gregorriegler.frameworkdependency.services.LibraryService;
@@ -14,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,8 +30,10 @@ public class LibraryController {
     }
 
     @GetMapping("/books")
-    public ResponseEntity<Collection<Book>> get(Authentication authentication) {
-        return ResponseEntity.ok(libraryService.getAllBooks(toUser(authentication)));
+    public ResponseEntity<List<BookResponse>> get(Authentication authentication) {
+        return ResponseEntity.ok(libraryService.getAllBooks(toUser(authentication)).stream()
+            .map(this::toBookResponse)
+            .toList());
     }
 
     @PutMapping("/books/{isbn}")
@@ -37,6 +41,13 @@ public class LibraryController {
     public void save(Authentication authentication, @PathVariable String isbn, @RequestBody CreateBookRequest request) {
         request.isbn = isbn;
         libraryService.createBook(toUser(authentication), new Book(isbn, request.title, request.author));
+    }
+
+    private BookResponse toBookResponse(Book book) {
+        List<RatingResponse> ratings = book.ratings.stream()
+            .map(rating -> new RatingResponse(rating.id, rating.user, rating.stars, rating.comment))
+            .toList();
+        return new BookResponse(book.isbn, book.title, book.author, ratings);
     }
 
     private User toUser(Authentication authentication) {

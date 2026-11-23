@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gregorriegler.frameworkdependency.infrastructure.persistence.BookEntity;
 import com.gregorriegler.frameworkdependency.infrastructure.persistence.SpringDataBookRepository;
-import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,13 +68,9 @@ public class LibraryTest {
 
         mockMvc.perform(get("/books"))
             .andExpect(status().isOk())
-            .andExpect(content().json("[" +
-                new JSONObject()
-                    .put("isbn", "123")
-                    .put("title", "Name of Book")
-                    .put("author", "Name of Author")
-                    .toString() +
-                "]"));
+            .andExpect(content().json("""
+                [{"isbn":"123","title":"Name of Book","author":"Name of Author","ratings":[]}]
+                """, true));
     }
 
     @Test
@@ -92,7 +87,7 @@ public class LibraryTest {
 
     @Test
     @WithMockUser(username = "max", roles = "USER")
-    void user_can_rate_a_book() throws Exception {
+    void returns_book_and_rating_response_contract() throws Exception {
         springDataBookRepository.save(new BookEntity("123", "irrelevant", "irrelevant"));
 
         mockMvc.perform(post("/books/123/ratings")
@@ -103,21 +98,16 @@ public class LibraryTest {
                 .toString()))
             .andExpect(status().isCreated());
 
-        mockMvc.perform(get("/books"))
-            .andExpect(status().isOk())
-            .andExpect(content().json("[" +
-                new JSONObject()
-                    .put("isbn", "123")
-                    .put("title", "irrelevant")
-                    .put("author", "irrelevant")
-                    .put("ratings", new JSONArray()
-                        .put(new JSONObject()
-                            .put("user", "max")
-                            .put("stars", "FIVE")
-                            .put("comment", "Rating")
-                        ))
-                    .toString() +
-                "]"));
+        JsonNode books = listBooks();
+        JsonNode id = books.path(0).path("ratings").path(0).path("id");
+        assertThat(id.isIntegralNumber()).isTrue();
+        assertThat(id.asLong()).isPositive();
+        assertThat(books).isEqualTo(objectMapper.readTree("""
+            [{
+                "isbn":"123","title":"irrelevant","author":"irrelevant",
+                "ratings":[{"id":%d,"user":"max","stars":"FIVE","comment":"Rating"}]
+            }]
+            """.formatted(id.asLong())));
     }
 
     @Test
