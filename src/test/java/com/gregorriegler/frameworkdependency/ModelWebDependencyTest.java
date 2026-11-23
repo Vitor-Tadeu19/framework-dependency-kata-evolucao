@@ -1,5 +1,6 @@
 package com.gregorriegler.frameworkdependency;
 
+import com.gregorriegler.frameworkdependency.model.User;
 import com.gregorriegler.frameworkdependency.services.LibraryService;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ public class ModelWebDependencyTest {
 
     @Test
     void model_does_not_return_web_response_types() throws NoSuchMethodException {
-        Method method = LibraryService.class.getDeclaredMethod("getAllBooks");
+        Method method = LibraryService.class.getDeclaredMethod("getAllBooks", User.class);
 
         assertThat(method.getReturnType().getName()).isEqualTo("java.util.Collection");
     }

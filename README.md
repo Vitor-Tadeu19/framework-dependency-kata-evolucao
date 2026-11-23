@@ -20,6 +20,26 @@ Keeping the framework out of your model can be advantageous.
 There are integrated tests covering the whole application.
 Run them in your IDE or use the `./tdd.sh` script or `tdd` on Windows to run your tests continuously.
 
+## RF02 · Desacoplamento da persistência
+
+`LibraryService` e `RatingService` recebem a interface Java
+`BookRepository`. `JpaBookRepository` converte os modelos de domínio
+para as entidades JPA e usa `SpringDataBookRepository` para persistir.
+As leituras convertem as avaliações dentro de uma transação.
+
+O H2 legado guarda o vínculo em `BOOK_RATINGS(BOOK_ISBN, RATINGS_ID)` e
+gera `RATING.ID` como `INTEGER` por meio de `RATING_SEQ`, com incremento
+de 50. O adaptador usa esse esquema físico e expõe o ID como `Long` no
+domínio. O ISBN continua sendo a chave do livro.
+
+A adoção de `RATING.BOOK_ISBN` e `BIGINT IDENTITY` exige transferir os
+vínculos da tabela intermediária, manter os IDs existentes e inicializar a
+identidade acima do maior ID.
+
+No Windows, execute `.\gradlew.bat clean test` com Java 21.
+Os testes de integração usam H2 em memória. A avaliação de ISBN
+inexistente retorna HTTP 201 sem gravar, conforme o comportamento legado.
+
 ## Refactoring Exercises
 
 The model package contains all (honestly not much) business logic and is scattered with framework dependencies.

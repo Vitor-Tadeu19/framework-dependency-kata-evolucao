@@ -1,5 +1,7 @@
 package com.gregorriegler.frameworkdependency;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gregorriegler.frameworkdependency.infrastructure.persistence.BookEntity;
 import com.gregorriegler.frameworkdependency.infrastructure.persistence.SpringDataBookRepository;
 import org.json.JSONArray;
@@ -13,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -25,6 +28,9 @@ public class LibraryTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private SpringDataBookRepository springDataBookRepository;
@@ -112,6 +118,57 @@ public class LibraryTest {
                         ))
                     .toString() +
                 "]"));
+    }
+
+    @Test
+    @WithMockUser(username = "manager", roles = {"ADMIN", "USER"})
+    void updatingBookThroughHttpPreservesBothRatings() throws Exception {
+        mockMvc.perform(put("/books/123")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {"title":"Original","author":"Original Author"}
+                """))
+            .andExpect(status().isNoContent());
+        mockMvc.perform(post("/books/123/ratings")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {"stars":"FIVE","comment":"First"}
+                """))
+            .andExpect(status().isCreated());
+        mockMvc.perform(post("/books/123/ratings")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {"stars":"FOUR","comment":"Second"}
+                """))
+            .andExpect(status().isCreated());
+
+        JsonNode before = listBooks().get(0).get("ratings");
+        assertThat(before).hasSize(2);
+        assertThat(before).extracting(rating -> rating.path("id").asLong())
+            .doesNotContain(0L).doesNotHaveDuplicates();
+        assertThat(before).extracting(rating -> rating.path("comment").asText())
+            .containsExactlyInAnyOrder("First", "Second");
+
+        mockMvc.perform(put("/books/123")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("""
+                {"title":"Updated","author":"Updated Author"}
+                """))
+            .andExpect(status().isNoContent());
+
+        assertThat(listBooks()).singleElement().satisfies(book -> {
+            assertThat(book.path("isbn").asText()).isEqualTo("123");
+            assertThat(book.path("title").asText()).isEqualTo("Updated");
+            assertThat(book.path("author").asText()).isEqualTo("Updated Author");
+            assertThat(book.get("ratings")).containsExactlyInAnyOrderElementsOf(before);
+        });
+    }
+
+    private JsonNode listBooks() throws Exception {
+        String response = mockMvc.perform(get("/books"))
+            .andExpect(status().isOk())
+            .andReturn().getResponse().getContentAsString();
+        return objectMapper.readTree(response);
     }
 
     @Test

@@ -5,6 +5,7 @@ import com.gregorriegler.frameworkdependency.model.Book;
 import com.gregorriegler.frameworkdependency.model.User;
 import com.gregorriegler.frameworkdependency.repository.BookRepository;
 import com.gregorriegler.frameworkdependency.security.SecurityService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
@@ -19,10 +20,6 @@ public class LibraryService {
         this.repository = repository;
     }
 
-    public Collection<Book> getAllBooks() {
-        throw new AuthorizationException("access denied!");
-    }
-
     public Collection<Book> getAllBooks(User user) {
         if (!securityService.canViewLibrary(user)) {
             throw new AuthorizationException("access denied!");
@@ -30,6 +27,7 @@ public class LibraryService {
         return repository.findAll();
     }
 
+    @Transactional
     public void createBook(User user, Book book) {
         if (!securityService.canCreateBook(user)) {
             throw new AuthorizationException("access denied!");

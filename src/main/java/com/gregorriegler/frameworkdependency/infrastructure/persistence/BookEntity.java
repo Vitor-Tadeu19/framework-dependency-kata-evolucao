@@ -3,11 +3,13 @@ package com.gregorriegler.frameworkdependency.infrastructure.persistence;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "book")
@@ -17,8 +19,11 @@ public class BookEntity {
     public String title;
     public String author;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<RatingEntity> ratings = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "book_ratings",
+        joinColumns = @JoinColumn(name = "book_isbn"),
+        inverseJoinColumns = @JoinColumn(name = "ratings_id", unique = true))
+    public Set<RatingEntity> ratings = new LinkedHashSet<>();
 
     public BookEntity() {
     }
