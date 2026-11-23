@@ -8,7 +8,6 @@ import com.gregorriegler.frameworkdependency.security.SecurityService;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 public class LibraryService {
 
@@ -39,9 +38,4 @@ public class LibraryService {
         repository.save(persistedBook);
     }
 
-    public String generateBookReport() {
-        return repository.findAll().stream()
-            .map(book -> book.isbn + "," + book.title)
-            .collect(Collectors.joining("\n"));
-    }
 }

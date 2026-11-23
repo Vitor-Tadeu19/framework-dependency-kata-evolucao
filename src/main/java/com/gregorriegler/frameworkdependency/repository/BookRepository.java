@@ -8,6 +8,8 @@ import java.util.Optional;
 public interface BookRepository {
     Collection<Book> findAll();
 
+    Collection<BookReportEntry> findReportEntries();
+
     Optional<Book> findById(String isbn);
 
     void save(Book book);

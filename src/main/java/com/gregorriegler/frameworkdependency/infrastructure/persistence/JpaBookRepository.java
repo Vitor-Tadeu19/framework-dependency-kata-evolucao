@@ -2,6 +2,7 @@ package com.gregorriegler.frameworkdependency.infrastructure.persistence;
 
 import com.gregorriegler.frameworkdependency.model.Book;
 import com.gregorriegler.frameworkdependency.model.Rating;
+import com.gregorriegler.frameworkdependency.repository.BookReportEntry;
 import com.gregorriegler.frameworkdependency.repository.BookRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,12 @@ public class JpaBookRepository implements BookRepository {
         return springRepository.findAll().stream()
             .map(this::toBook)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Collection<BookReportEntry> findReportEntries() {
+        return springRepository.findReportEntries();
     }
 
     @Override

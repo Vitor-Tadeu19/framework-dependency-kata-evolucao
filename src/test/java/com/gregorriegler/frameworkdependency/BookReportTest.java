@@ -5,6 +5,7 @@ import com.gregorriegler.frameworkdependency.model.Book;
 import com.gregorriegler.frameworkdependency.model.User;
 import com.gregorriegler.frameworkdependency.model.enums.RatingStars;
 import com.gregorriegler.frameworkdependency.repository.BookRepository;
+import com.gregorriegler.frameworkdependency.services.BookReportService;
 import com.gregorriegler.frameworkdependency.services.LibraryService;
 import com.gregorriegler.frameworkdependency.services.RatingService;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +34,9 @@ class BookReportTest {
     @Autowired
     private RatingService ratingService;
 
+    @Autowired
+    private BookReportService reportService;
+
     @BeforeEach
     void clearBooks() {
         springDataBookRepository.deleteAll();
@@ -40,13 +44,13 @@ class BookReportTest {
 
     @Test
     void generatesCsvForPersistedBookOutsideHttp() {
-        libraryService.createBook(MANAGER, new Book("123", "title", "Author"));
+        libraryService.createBook(MANAGER, new Book("123", "Title, \"quoted\"", "Author"));
         ratingService.rateBook(MANAGER, "123", RatingStars.FIVE, "First");
 
         assertThat(repository.findById("123").orElseThrow().ratings).hasSize(1);
         assertThat(repository.findAll()).singleElement().satisfies(book ->
             assertThat(book.ratings).hasSize(1));
-        assertThat(libraryService.generateBookReport()).isEqualTo("123,title");
+        assertThat(reportService.generateBookReport()).isEqualTo("123,\"Title, \"\"quoted\"\"\"");
     }
 
     @Test

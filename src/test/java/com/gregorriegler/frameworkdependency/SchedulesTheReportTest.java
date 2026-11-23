@@ -1,6 +1,8 @@
 package com.gregorriegler.frameworkdependency;
 
-import com.gregorriegler.frameworkdependency.services.LibraryService;
+import com.gregorriegler.frameworkdependency.scheduler.LibraryReportScheduler;
+import com.gregorriegler.frameworkdependency.infrastructure.report.BookReportFileWriter;
+import com.gregorriegler.frameworkdependency.services.BookReportService;
 import org.junit.jupiter.api.Test;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -15,13 +17,14 @@ public class SchedulesTheReportTest {
 
     @Test
     public void scheduler_runs_report_generation() throws Exception {
-        LibraryService libraryService = mock(LibraryService.class);
-        when(libraryService.generateBookReport()).thenReturn("123,title");
-        LibraryReportScheduler scheduler = new LibraryReportScheduler(libraryService);
+        BookReportService reportService = mock(BookReportService.class);
+        BookReportFileWriter writer = mock(BookReportFileWriter.class);
+        when(reportService.generateBookReport()).thenReturn("123,title");
+        LibraryReportScheduler scheduler = new LibraryReportScheduler(reportService, writer);
 
         scheduler.runReport();
 
-        verify(libraryService).generateBookReport();
+        verify(writer).write("123,title");
     }
 
     @Test
@@ -29,5 +32,6 @@ public class SchedulesTheReportTest {
         Method method = LibraryReportScheduler.class.getDeclaredMethod("runReport");
 
         assertThat(method.getAnnotation(Scheduled.class)).isNotNull();
+        assertThat(method.getAnnotation(Scheduled.class).fixedRate()).isEqualTo(25_000);
     }
 }
